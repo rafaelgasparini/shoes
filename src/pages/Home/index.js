@@ -1,88 +1,59 @@
-import React from 'react';
-import { ProductList } from './styles';
-import { MdAddShoppingCart } from 'react-icons/md';
+import React, {Component} from 'react';
+import {connect} from 'react-redux';
+import {MdAddShoppingCart} from 'react-icons/md';
+import {formatPrice} from "../../util/format";
+import api from "../../services/api";
 
-export default function Home() {
-    return (
-        <ProductList>
-            <li>
-                <img src="https://static.netshoes.com.br/produtos/tenis-nike-sb-check-solar-cnvs-masculino/90/D12-2759-890/D12-2759-890_detalhe1.jpg?resize=280:280"
-                    alt="Tênis" />
-                <strong>Tênis muito legal</strong>
-                <span>R$129,90</span>
+import {ProductList} from './styles';
 
-                <button type="button">
-                    <div>
-                        <MdAddShoppingCart size={16} color="#FFF" />3
-                    </div>
-                    <span>ADICIONAR AO CARRINHO</span>
-                </button>
-            </li>
-            <li>
-                <img src="https://static.netshoes.com.br/produtos/tenis-nike-sb-check-solar-cnvs-masculino/90/D12-2759-890/D12-2759-890_detalhe1.jpg?resize=280:280"
-                    alt="Tênis" />
-                <strong>Tênis muito legal</strong>
-                <span>R$129,90</span>
+class Home extends Component {
+    state = {
+        products: [],
+    };
 
-                <button type="button">
-                    <div>
-                        <MdAddShoppingCart size={16} color="#FFF" />3
-                    </div>
-                    <span>ADICIONAR AO CARRINHO</span>
-                </button>
-            </li>
-            <li>
-                <img src="https://static.netshoes.com.br/produtos/tenis-nike-sb-check-solar-cnvs-masculino/90/D12-2759-890/D12-2759-890_detalhe1.jpg?resize=280:280" alt="Tênis" />
+    async componentDidMount() {
+        const response = await api.get('products');
 
-                <strong>Tênis muito legal</strong>
-                <span>R$129,90</span>
+        const data = response.data.map(product => ({
+            ...product,
+            priceFormatted: formatPrice(product.price)
+        }));
 
-                <button>
-                    <div>
-                        <MdAddShoppingCart size={16} color="#FFF" /> 3
-                </div>
-                    <span>ADICIONAR AO CARRINHO</span>
-                </button>
-            </li>
-            <li>
-                <img src="https://static.netshoes.com.br/produtos/tenis-nike-sb-check-solar-cnvs-masculino/90/D12-2759-890/D12-2759-890_detalhe1.jpg?resize=280:280" alt="Tênis" />
+        this.setState({products: data})
+    }
 
-                <strong>Tênis muito legal</strong>
-                <span>R$129,90</span>
+    handleAddProduct = product => {
+        const {dispatch} = this.props;
+        dispatch({
+            type: 'ADD_TO_CART',
+            product
+        })
+    };
 
-                <button>
-                    <div>
-                        <MdAddShoppingCart size={16} color="#FFF" /> 3
-                </div>
-                    <span>ADICIONAR AO CARRINHO</span>
-                </button>
-            </li>
-            <li>
-                <img src="https://static.netshoes.com.br/produtos/tenis-nike-sb-check-solar-cnvs-masculino/90/D12-2759-890/D12-2759-890_detalhe1.jpg?resize=280:280" alt="Tênis" />
+    render() {
+        const {products} = this.state;
+        return (
+            <ProductList>
+                {products.map(product => (
+                    <li key={product.id}>
+                        <img
+                            src={product.image}
+                            alt={product.title}/>
+                        <strong>{product.title}</strong>
+                        <span>{product.priceFormatted}</span>
 
-                <strong>Tênis muito legal</strong>
-                <span>R$129,90</span>
+                        <button type="button" onClick={() => this.handleAddProduct(product)}>
+                            <div>
+                                <MdAddShoppingCart size={16} color="#FFF"/>3
+                            </div>
+                            <span>ADICIONAR AO CARRINHO</span>
+                        </button>
+                    </li>
+                ))}
 
-                <button>
-                    <div>
-                        <MdAddShoppingCart size={16} color="#FFF" /> 3
-                </div>
-                    <span>ADICIONAR AO CARRINHO</span>
-                </button>
-            </li>
-            <li>
-                <img src="https://static.netshoes.com.br/produtos/tenis-nike-sb-check-solar-cnvs-masculino/90/D12-2759-890/D12-2759-890_detalhe1.jpg?resize=280:280" alt="Tênis" />
-
-                <strong>Tênis muito legal</strong>
-                <span>R$129,90</span>
-
-                <button>
-                    <div>
-                        <MdAddShoppingCart size={16} color="#FFF" /> 3
-                </div>
-                    <span>ADICIONAR AO CARRINHO</span>
-                </button>
-            </li>
-        </ProductList>
-    )
+            </ProductList>
+        )
+    }
 }
+
+export default connect()(Home);
